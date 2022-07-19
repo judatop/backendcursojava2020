@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -25,6 +27,7 @@ import net.copicomp.backendcursojava.services.UserServiceInterface;
 import net.copicomp.backendcursojava.shared.dto.PostCreationDto;
 import net.copicomp.backendcursojava.shared.dto.PostDto;
 import net.copicomp.backendcursojava.shared.dto.UserDto;
+import net.copicomp.backendcursojava.utils.Exposures;
 
 @RestController
 @RequestMapping("/posts") //localhost:8080/posts
@@ -41,7 +44,7 @@ public class PostController {
     
 
     @PostMapping
-    public PostRest createPost(@RequestBody PostCreateRequestModel createRequestModel){
+    public PostRest createPost(@RequestBody @Valid PostCreateRequestModel createRequestModel){
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -54,10 +57,6 @@ public class PostController {
         PostDto postDto = postServiceInterface.createPost(postCreationDto);
 
         PostRest postToReturn = mapper.map(postDto, PostRest.class);
-
-        if (postToReturn.getExpiresAt().compareTo(new Date(System.currentTimeMillis())) < 0){
-            postToReturn.setExpired(true);
-        }
 
         return postToReturn;
     }
@@ -87,12 +86,9 @@ public class PostController {
 
         PostRest postRest = mapper.map(postDto, PostRest.class);
 
-        if (postRest.getExpiresAt().compareTo(new Date(System.currentTimeMillis())) < 0){
-            postRest.setExpired(true);
-        }
-
+        
         // Validamos si el post es privado o si el post ya expiro
-        if (postRest.getExposure().getId() == 1 || postRest.getExpired()) {
+        if (postRest.getExposure().getId() == Exposures.PRIVATE || postRest.getExpired()) {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
             UserDto user = userServiceInterface.getUser(authentication.getPrincipal().toString());
@@ -124,7 +120,7 @@ public class PostController {
     }
 
     @PutMapping(path="/{id}")
-    public PostRest updatePost(@RequestBody PostCreateRequestModel postCreateRequestModel, @PathVariable String id){
+    public PostRest updatePost(@RequestBody @Valid PostCreateRequestModel postCreateRequestModel, @PathVariable String id){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         UserDto user = userServiceInterface.getUser(authentication.getPrincipal().toString());

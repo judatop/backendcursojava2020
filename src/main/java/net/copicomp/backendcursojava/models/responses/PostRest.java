@@ -14,7 +14,7 @@ public class PostRest {
 
     private Date createdAt;
 
-    private boolean expired = false;
+    private boolean expired;
 
     private UserRest user;
 
@@ -66,6 +66,7 @@ public class PostRest {
     }
 
     public boolean getExpired() {
+        this.expired = getExpiresAt().compareTo(new Date(System.currentTimeMillis())) < 0;
         return this.expired;
     }
 

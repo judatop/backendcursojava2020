@@ -17,6 +17,7 @@ import net.copicomp.backendcursojava.repositories.PostRepository;
 import net.copicomp.backendcursojava.repositories.UserRepository;
 import net.copicomp.backendcursojava.shared.dto.PostCreationDto;
 import net.copicomp.backendcursojava.shared.dto.PostDto;
+import net.copicomp.backendcursojava.utils.Exposures;
 
 @Service
 public class PostService implements PostServiceInterface{
@@ -57,9 +58,7 @@ public class PostService implements PostServiceInterface{
     @Override
     public List<PostDto> getLastPosts() {
 
-        long publicExposureId = 2;
-
-        List<PostEntity> postsEntities = postRepository.getLastPublicPosts(publicExposureId, new Date(System.currentTimeMillis()));
+        List<PostEntity> postsEntities = postRepository.getLastPublicPosts(Exposures.PUBLIC, new Date(System.currentTimeMillis()));
 
         List<PostDto> postDtos = new ArrayList<>();
 
